@@ -65,3 +65,54 @@ generalizationerror = 1-testacc
 
 print(f"The test Accuracy is {testacc:.4f}")
 print(f"And the generalization Error is {generalizationerror:.4f}")
+
+#step8
+training_data2 = sw.iloc[:400]
+validation_data2 = sw.iloc[400:800]
+testing_data2 = sw.iloc[800:1600] 
+
+print("\nSecond split : 400 training, 400 validation, 800 test")
+print(len(training_data2))
+print(len(validation_data2))
+print(len(testing_data2))
+
+feature_cols = [col for col in sw.columns if col not in ['quality', 'good_wine']]
+mu2 = training_data2[feature_cols].mean()
+sigma2 = training_data2[feature_cols].std()
+sigma2 = sigma2.replace(0, 1) 
+
+xtraining2 = training_data2[feature_cols]
+ytraining2 = training_data2['good_wine']
+xvalidation2 = validation_data2[feature_cols]
+yvalidation2 = validation_data2['good_wine']
+xtest2 = testing_data2[feature_cols]
+ytest2 = testing_data2['good_wine']
+
+xtraningnorm2 = (xtraining2 - mu2) / sigma2
+xvalnorm2 = (xvalidation2 - mu2) / sigma2
+xtestnorm2 = (xtest2 - mu2) / sigma2
+
+k_values2 = range(1, 101)
+accuracy2 = []
+
+for k in k_values2:
+    knn2 = KNeighborsClassifier(n_neighbors=k)
+    knn2.fit(xtraningnorm2, ytraining2)
+    yvalpred2 = knn2.predict(xvalnorm2) 
+    acc2 = accuracy_score(yvalidation2, yvalpred2)
+    accuracy2.append(acc2)
+    if k % 10 == 0 or k == 1:
+        print(f"k={k}: Validation Accuracy={acc2:.4f}")
+
+bestk2 = k_values2[np.argmax(accuracy2)]
+bestacc2 = max(accuracy2)
+print(f"\nThe best K is {bestk2} with a validation accuracy of {bestacc2:.4f}")
+
+bestknn2 = KNeighborsClassifier(n_neighbors=bestk2)
+bestknn2.fit(xtraningnorm2, ytraining2)
+ytestprediction2 = bestknn2.predict(xtestnorm2)
+testacc2 = accuracy_score(ytest2, ytestprediction2)
+generalizationerror2 = 1 - testacc2
+
+print(f"The test Accuracy is {testacc2:.4f}")
+print(f"And the generalization Error is {generalizationerror2:.4f}")
