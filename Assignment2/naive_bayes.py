@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 class NaiveBayesForSpam:
     def train (self, hamMessages, spamMessages):
         self.words = set (' '.join (hamMessages + spamMessages).split())
